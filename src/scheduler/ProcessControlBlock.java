@@ -10,6 +10,7 @@ public class ProcessControlBlock {
     private int currentBurstDuration;  //how much of the current burst is left.
     private String state; //the current state of the process.
     private int pid;  //the pid of the process.
+    private int ioRequestTime; //the moment in time when an I/O request is made.
 
     private static int pidSource = 2;
 
@@ -34,7 +35,7 @@ public class ProcessControlBlock {
         pid = pidSource++;
     }
 
-    public int execute(int quantum) {
+    public int execute(int quantum, int clock) {
         if(quantum < currentBurstDuration) {
             System.out.println(pid + " will use entire quantum.");
             currentBurstDuration -= quantum;
@@ -47,6 +48,7 @@ public class ProcessControlBlock {
             duration -= currentBurstDuration;
             currentBurstDuration = ioBurstTime;
             state = WAITING;
+            ioRequestTime = clock;
             System.out.println(pid + " remaining duration: " + duration);
             return usedTime;
         } else {
@@ -59,17 +61,16 @@ public class ProcessControlBlock {
         }
     }
 
-    public void update(int timeSinceLastUpdate) {
-        if(state.equals(READY)); // do nothing.  process is already ready
-        else if(state.equals(WAITING)) {
-            if(timeSinceLastUpdate > currentBurstDuration) {
+    public void update(int clock) {
+        //System.out.println(pid + " clock: " + clock + "; currentBurstDuration: " + currentBurstDuration + "; ioRequestTime: " + ioRequestTime);
+        if(state.equals(WAITING)) {
+            if(clock - currentBurstDuration > ioRequestTime) {
                 currentBurstDuration = cpuBurstTime;
                 state = READY;
-            } else {
-                currentBurstDuration -= timeSinceLastUpdate;
             }
         }
     }
+
 
     public String state()   {  return state;  }
 
@@ -81,5 +82,10 @@ public class ProcessControlBlock {
             return ((ProcessControlBlock) o).pid == pid;
         }
         return false;
+    }
+
+    public String toString() {
+        return "{" + pid + ", " + state + ", " + duration + ", " + cpuBurstTime +
+                    ", " + ioBurstTime + ", " + currentBurstDuration + "}";
     }
 }

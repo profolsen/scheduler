@@ -5,9 +5,8 @@ package scheduler;
  */
 public abstract class Scheduler implements Iterable<ProcessControlBlock> {
 
-    private int contextSwitchTime;  //how long a context switch takes.
-    private int clock;  //the number of cycles since the system was "started" (the current time).
-    private int lastUpdateTime;  //the time at which the last update happened.
+    protected int contextSwitchTime;  //how long a context switch takes.
+    protected int clock;  //the number of cycles since the system was "started" (the current time).
 
     public Scheduler(int contextSwitchTime) {
         this.contextSwitchTime = contextSwitchTime;
@@ -21,16 +20,20 @@ public abstract class Scheduler implements Iterable<ProcessControlBlock> {
 
     public void execute() {
         System.out.println("Executing Processes");
-        while(!isEmpty()) {
+        while(!isEmpty() && clock < 100) {
+            updateProcessControlBlocks();
+            System.out.println("---------Current Processes----------(CLOCK: " + clock + ")");
+            for(ProcessControlBlock pcb : this) {
+                System.out.println(pcb);
+            }
             ProcessControlBlock pcb = next();
             clock += contextSwitchTime;  //a context switch is happening...
             if(pcb == null) {
                 tick();
                 continue;
             }
-            System.out.println("running " + pcb.pid() + " @" + clock);
+            System.out.println(pcb + "@" + clock);
             execute(pcb);
-            updateProcessControlBlocks();
             add(pcb);
         }
     }
@@ -44,11 +47,10 @@ public abstract class Scheduler implements Iterable<ProcessControlBlock> {
     }
 
     public void updateProcessControlBlocks() {
-        int timeSinceLastUpdate = clock - lastUpdateTime;
+        //System.out.println("Updating Processes (CLOCK: " + clock + ")");
         for(ProcessControlBlock pcb : this) {
-            pcb.update(timeSinceLastUpdate);
+            pcb.update(clock);
         }
-        lastUpdateTime = clock;
     }
 
 }

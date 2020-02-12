@@ -49,7 +49,7 @@ public class FirstComeFirstServe extends Scheduler {
     @Override
     public void execute(ProcessControlBlock pcb) {
         while(pcb.state().equals(ProcessControlBlock.READY)) {
-            pcb.execute(1);
+            pcb.execute(1, clock);
             tick();
         }
     }
