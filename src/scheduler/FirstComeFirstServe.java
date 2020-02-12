@@ -18,6 +18,7 @@ public class FirstComeFirstServe extends Scheduler {
         super(contextSwitchTime);
         readyQueue = new LinkedList<ProcessControlBlock>();
         waitQueue = new LinkedList<ProcessControlBlock>();
+        terminated = new LinkedList<ProcessControlBlock>();
     }
 
     @Override
@@ -31,7 +32,10 @@ public class FirstComeFirstServe extends Scheduler {
     @Override
     public ProcessControlBlock next() {
         for(ProcessControlBlock pcb : waitQueue) {
-            if(pcb.state().equals(ProcessControlBlock.READY)) readyQueue.add(pcb);
+            if(pcb.state().equals(ProcessControlBlock.READY)) {
+                readyQueue.add(pcb);
+                waitQueue.remove(pcb);
+            }
         }
         if(! readyQueue.isEmpty()) return readyQueue.remove();
         return null;

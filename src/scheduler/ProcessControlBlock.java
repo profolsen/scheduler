@@ -75,4 +75,11 @@ public class ProcessControlBlock {
 
 
     public int pid()     {  return pid;    }
+
+    public boolean equals(Object o) {
+        if(o instanceof ProcessControlBlock) {
+            return ((ProcessControlBlock) o).pid == pid;
+        }
+        return false;
+    }
 }
