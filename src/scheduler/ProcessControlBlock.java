@@ -36,7 +36,7 @@ public class ProcessControlBlock {
     }
 
     public int execute(int quantum, int clock) {
-        if(quantum < currentBurstDuration) {
+        if(quantum < currentBurstDuration && quantum < duration) {
             System.out.println(pid + " will use entire quantum.");
             currentBurstDuration -= quantum;
             duration -= quantum;
